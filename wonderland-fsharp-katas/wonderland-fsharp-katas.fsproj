@@ -32,24 +32,6 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Release\wonderland_fsharp_katas.XML</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="alphabet-cipher.fsx" />
-    <None Include="doublets.fsx" />
-    <None Include="wonderland-number.fsx" />
-    <None Include="card-game-war.fsx" />
-    <None Include="fox-goose-bag-of-corn.fsx" />
-    <None Include="magic-square.fsx" />
-    <None Include="tiny-maze.fsx" />
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -102,4 +84,24 @@
       </ItemGroup>
     </When>
   </Choose>
+  <ItemGroup>
+    <None Include="alphabet-cipher.fsx" />
+    <None Include="doublets.fsx" />
+    <None Include="wonderland-number.fsx" />
+    <None Include="card-game-war.fsx" />
+    <None Include="fox-goose-bag-of-corn.fsx" />
+    <None Include="magic-square.fsx" />
+    <None Include="tiny-maze.fsx" />
+    <None Include="Script1.fsx" />
+    <Content Include="words.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
 </Project>
