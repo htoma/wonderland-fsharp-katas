@@ -73,9 +73,6 @@ let getGraph (length: int ) (dictionary: string seq) =
     |> List.filter (fun (w,v) -> areDiffByOne w v)
     |> createGraph
    
-//starts searching from v until a node with value t is found
-//provides the first solution as a list of node values
-//None otherwise
 let search (v: 'a Vertex ) (t: 'a) =
     let containsData (t: 'a) (vlist: Vertex<'a> list) =
         vlist
