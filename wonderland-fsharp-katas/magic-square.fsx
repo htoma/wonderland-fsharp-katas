@@ -34,7 +34,6 @@ let sumDownDiagonal (sq:Square) =
 let sumUpDiagonal (sq:Square) =
     [ for i in indexes -> sq.[i, maxIndex - i] ] |> List.sum
 
-
 let tests () =
 
     let magic = magicSquare ()
