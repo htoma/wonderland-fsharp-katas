@@ -19,6 +19,18 @@ type Square = float[,]
 
 let dim = 3
 
+let maxIndex = dim - 1
+let indexes = [ 0 .. maxIndex ]
+
+let row (sq:Square) i = [ for col in indexes -> sq.[i,col] ]
+let col (sq:Square) i = [ for row in indexes -> sq.[row,i] ]
+
+let sumColumn (sq:Square) col =
+    [ for row in indexes -> sq.[row,col] ] |> List.sum
+
+let sumRow (sq:Square) row =
+    [ for col in indexes -> sq.[row,col] ] |> List.sum
+
 let magicSquare () =
     let sum = (values |> Array.sum) / (float)dim
 
@@ -47,8 +59,14 @@ let magicSquare () =
     let secondDiag = elDiag |> List.except firstDiag |> Array.ofList
     for i in [0..(dim-1)] do
         if i<>(dim/2) then
-            square.[i,i]<- firstDiag.[i-(if i>dim/2 then 1 else 0)]
-            square.[i,2-i]<- firstDiag.[i-(if i>dim/2 then 1 else 0)]
+            square.[i,i]<- firstDiag.[i-( if i>dim/2 then 1 else 0)]
+            square.[i,2-i]<- secondDiag.[i-( if i>dim/2 then 1 else 0)]
+    //the easy way :)
+    for i in [0..(dim-1)] do
+        for j in [0..(dim-1)] do
+            if square.[i,j]=0. then
+                square.[i,j]<-System.Math.Min(sum-(sumColumn square j), sum-(sumRow square i))
+
     square
 
 magicSquare()
