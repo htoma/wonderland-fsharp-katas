@@ -1,73 +1,65 @@
-﻿let listAfter (pos: int) (values: 'a list) =
-          values |> List.skip (pos+1)
+﻿type Cell =
+    | Start
+    | Exit
+    | Empty
+    | Wall
 
-let generateComb (values: 'a list) (n: int) =
-    let rec gc (values: 'a list) (cur: int) =
-        if cur=n then [[]]
-        else
-            values
-            |> List.mapi (fun i x -> i,x)
-            |> List.map (fun (i,v) -> 
-                gc (values |> listAfter i) (cur+1)
-                |> List.map (fun x -> v::x))
-            |> List.concat
-    gc values 0
+type Maze = Cell [,]
 
-let values = [| 1.0 .. 0.5 .. 5.0 |]
+type Path =
+    | X
+    | O
 
-type Square = float[,]
+type Solution = Path [,]
 
-let dim = 3
+let rows (maze:Maze) =
+    (int) (System.Math.Sqrt((float)maze.Length))
 
-let maxIndex = dim - 1
-let indexes = [ 0 .. maxIndex ]
+let getNeighbors (maze:Maze) i j =
+    let rows = rows maze
+    [i-1,j
+     i,j-1
+     i,j+1
+     i+1,j]
+     |> List.filter (fun (i,j) -> i>=0 && i<rows && j>=0 && j<rows)
 
-let row (sq:Square) i = [ for col in indexes -> sq.[i,col] ]
-let col (sq:Square) i = [ for row in indexes -> sq.[row,i] ]
+let findStart (maze:Maze) =
+    let rows = rows maze
+    [for i in 0..rows-1 do
+        for j in 0..rows-1 -> i,j,maze.[i,j]]
+    |> List.filter (fun (i,j,v) -> v=Start)
+    |> List.exactlyOne
 
-let sumColumn (sq:Square) col =
-    [ for row in indexes -> sq.[row,col] ] |> List.sum
-
-let sumRow (sq:Square) row =
-    [ for col in indexes -> sq.[row,col] ] |> List.sum
-
-let magicSquare () =
-    let sum = (values |> Array.sum) / (float)dim
-
-    let lines = generateComb (values |> List.ofArray) dim
-                |> List.filter (fun l -> l |> List.sum = sum)
-
-    let hist = 
-        lines
-        |> List.concat
-        |> List.groupBy (fun v -> v)
-        |> List.map (fun (k,l) -> k,l.Length)
-
-    let findEl (hist: ('a*int) list) (count: int) =
-        hist 
-        |> List.filter (fun (k,c) -> c=count) 
-        |> List.map (fun (v,_) -> v)
+let solve (maze:Maze) : Solution =
+    let i,j,start = findStart maze
+    let mutable seen = [] |> Set.ofList
+                    
+    let rec advance (i,j) =
+        seen<-seen.Add (i,j)
+        match maze.[i,j] with
+        | Exit -> [(i,j)]
+        | Start | Empty ->
+            let sol = getNeighbors maze i j
+                        |> List.filter (fun (i,j) -> Set.contains (i,j) seen |> not)
+                        |> List.map (fun v -> advance v)
+                        |> List.tryFind (fun v -> v |> List.length>0)
+            match sol with
+            | Some acc -> (i,j)::acc
+            | None -> []
+        | _ -> []
+        
+    let track = advance (i,j)
+    let rows = rows maze
+    [for i in 0..rows-1 ->
+        [for j in 0..rows-1 ->
+            if (track |> List.contains (i,j)) then X else O]
+    ] |> array2D
  
-    // fix this so that the tests pass!
-    let square = Array2D.init dim dim (fun row col -> 0.)
-
-    let center = findEl hist 4 |> List.head // middle element has 4 lines passing through
-    square.[dim/2,dim/2]<-center
-
-    let elDiag = findEl hist 3
-    let firstDiag = [|elDiag.Head;elDiag |> List.find (fun v -> v+center+elDiag.Head=sum)|]
-    let secondDiag = elDiag |> List.except firstDiag |> Array.ofList
-    for i in [0..(dim-1)] do
-        if i<>(dim/2) then
-            square.[i,i]<- firstDiag.[i-( if i>dim/2 then 1 else 0)]
-            square.[i,2-i]<- secondDiag.[i-( if i>dim/2 then 1 else 0)]
-    //the easy way :)
-    for i in [0..(dim-1)] do
-        for j in [0..(dim-1)] do
-            if square.[i,j]=0. then
-                square.[i,j]<-System.Math.Min(sum-(sumColumn square j), sum-(sumRow square i))
-
-    square
-
-magicSquare()
-
+let maze3x3 =
+        [ [Start; Empty; Wall]
+          [Wall;  Empty; Wall]
+          [Wall;  Empty; Exit]]
+        |> array2D
+               
+solve maze3x3
+ 
